@@ -53,11 +53,20 @@ void save24HourLog() {
 
 void load24HourLog() {
   String[] strings = loadStrings("hourLog.txt");
-  for (int i = 0; i < strings.length; i++) {
-    cumulativeHourlyUsage[i] = parseFloat(strings[i]);
+  if (strings == null) {
+    // We had a failure loading the file (it might not exist),
+    //   so let's fill in our cumulativeHourlyUsage array with zeros
+    println("hourLog.txt NOT successfully loaded.");
+    for (int i = 0; i < 24; i++) {
+      cumulativeHourlyUsage[i] = 0;
+    }
   }
-  // Add some error checking here to make sure we loaded the file fine
-  // if (debug) { println("hourLog.txt successfully loaded."); }
+  else {
+    if (debug) { println("hourLog.txt successfully loaded."); }
+    for (int i = 0; i < strings.length; i++) {
+      cumulativeHourlyUsage[i] = parseFloat(strings[i]);
+    }
+  }
 }
 
 
@@ -86,30 +95,37 @@ void saveDailyLog() {
 
 void loadDailyLog() {
   String[] strings = loadStrings("kWh-usage-daily.csv");
-  strings = expand(strings, strings.length+1); // Expand the array by 1 (strings.length automatically gives us 1 more than the length when counting from 0)
-  strings[strings.length - 1] = ",," + (currentkWhReading - midnightUsage); // Update the last value on the array to be our usage today so far
-  strings = reverse(strings);
-  strings = shorten(strings); // Remove the header line from the array
-  if (strings.length > 31) { // We have more than a month of data so we need to remove older data
-    // We're using 30 rather than 31 because strings[30] will be updated to be our kWh usage so far today
-    //
-    // This needs to be way more intelligent about month lengths and stuff. We'll probably need to use the Java Calendar functions to do so.
-    // We'll have to calculate the amount of days between billing dates and use that number instead of 30.
-    while (strings.length > 31) {
-      strings = shorten(strings); // shorten removes one line from the array each time it's called
+  if (strings == null) {
+    println("kWh-usage-daily.csv NOT successfully loaded.");
+    for (int i = 0; i < 31; i++) {
+      dailyUsage[i] = 0;
     }
   }
-  // Then zero out our array so things don't get messed up if the log file is shorter than the array
-  for (int i = 0; i < 31; i++) {
-    dailyUsage[i] = 0;
+  else {
+    strings = expand(strings, strings.length+1); // Expand the array by 1 (strings.length automatically gives us 1 more than the length when counting from 0)
+    strings[strings.length - 1] = ",," + (currentkWhReading - midnightUsage); // Update the last value on the array to be our usage today so far
+    strings = reverse(strings);
+    strings = shorten(strings); // Remove the header line from the array
+    if (strings.length > 31) { // We have more than a month of data so we need to remove older data
+      // We're using 30 rather than 31 because strings[30] will be updated to be our kWh usage so far today
+      //
+      // This needs to be way more intelligent about month lengths and stuff. We'll probably need to use the Java Calendar functions to do so.
+      // We'll have to calculate the amount of days between billing dates and use that number instead of 30.
+      while (strings.length > 31) {
+        strings = shorten(strings); // shorten removes one line from the array each time it's called
+      }
+    }
+    // Then zero out our array so things don't get messed up if the log file is shorter than the array
+    for (int i = 0; i < 31; i++) {
+      dailyUsage[i] = 0;
+    }
+    for (int i = 0; i < strings.length; i++) {
+      String[] cells = split(strings[i], ","); // Split up our string into individual "cells" at the comma (CSV==Comma Separated Values)
+      dailyUsage[i] = parseFloat(cells[2]);    // cells[2] should be DayTotalkWh
+    }
+    dailyUsage = reverse(dailyUsage);
+    if (debug) { println("kWh-usage-daily.csv successfully loaded."); }
   }
-  for (int i = 0; i < strings.length; i++) {
-    String[] cells = split(strings[i], ","); // Split up our string into individual "cells" at the comma (CSV==Comma Separated Values)
-    dailyUsage[i] = parseFloat(cells[2]);    // cells[2] should be DayTotalkWh
-  }
-  dailyUsage = reverse(dailyUsage);
-  // Add some error checking here to make sure we loaded the file fine
-  // if (debug) { println("kWh-usage-daily.csv successfully loaded."); }
 }
 
 
@@ -143,30 +159,37 @@ void saveMonthLog() {
 
 void loadMonthLog() {
   String[] strings = loadStrings("kWh-usage-monthly.csv");
-  strings = expand(strings, strings.length+1);         // Expand the array by 1 (strings.length automatically gives us 1 more than the length when counting from 0)
-  strings[strings.length - 1] = ",," + usageThisCycle; // Update the last value on the array to be our usage so far this billing cycle
-  strings = reverse(strings);
-  strings = shorten(strings);     // Remove the header line from the array
-  if (strings.length > 24) {      // We have more than 2 years of data so we need to remove older data
-    while (strings.length > 24) {
-      strings = shorten(strings); // shorten removes one line from the array each time it's called
+  if (strings == null) {
+    println("kWh-usage-daily.csv NOT successfully loaded.");
+    for (int i = 0; i < 24; i++) {
+      monthlyUsage[i] = 0;
     }
   }
-  // Then zero out our array so things don't get messed up if the log file is shorter than the array
-  for (int i = 0; i < 24; i++) {
-    monthlyUsage[i] = 0;
-  }
-  for (int i = 0; i < strings.length; i++) {
-    String[] cells = split(strings[i], ","); // Split up our string into individual "cells" at the comma (CSV==Comma Separated Values)
-    if (i == 1) {
-      // We need to save last months kWh usage to billingCycleStartUsage and since we're reversed array[1] will be our data
-      billingCycleStartUsage = parseFloat(cells[1]); // cells[1] should be EndOfMonthkWhReading, and billingCycleStartUsage is a float
+  else {
+    strings = expand(strings, strings.length+1);         // Expand the array by 1 (strings.length automatically gives us 1 more than the length when counting from 0)
+    strings[strings.length - 1] = ",," + usageThisCycle; // Update the last value on the array to be our usage so far this billing cycle
+    strings = reverse(strings);
+    strings = shorten(strings);     // Remove the header line from the array
+    if (strings.length > 24) {      // We have more than 2 years of data so we need to remove older data
+      while (strings.length > 24) {
+        strings = shorten(strings); // shorten removes one line from the array each time it's called
+      }
     }
-    monthlyUsage[i] = parseFloat(cells[2]);  // cells[2] should be MonthTotalkWh
+    // Then zero out our array so things don't get messed up if the log file is shorter than the array
+    for (int i = 0; i < 24; i++) {
+      monthlyUsage[i] = 0;
+    }
+    for (int i = 0; i < strings.length; i++) {
+      String[] cells = split(strings[i], ","); // Split up our string into individual "cells" at the comma (CSV==Comma Separated Values)
+      if (i == 1) {
+        // We need to save last months kWh usage to billingCycleStartUsage and since we're reversed array[1] will be our data
+        billingCycleStartUsage = parseFloat(cells[1]); // cells[1] should be EndOfMonthkWhReading, and billingCycleStartUsage is a float
+      }
+      monthlyUsage[i] = parseFloat(cells[2]);  // cells[2] should be MonthTotalkWh
+    }
+    monthlyUsage = reverse(monthlyUsage);
+    if (debug) { println("kWh-usage-daily.csv successfully loaded."); }
   }
-  monthlyUsage = reverse(monthlyUsage);
-  // Add some error checking here to make sure we loaded the file fine
-  // if (debug) { println("kWh-usage-daily.csv successfully loaded."); }
 }
 
 

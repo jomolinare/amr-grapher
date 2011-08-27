@@ -19,6 +19,8 @@
 //   holidays, and is sometimes randomly a day early/late for some reason. Also not accounted for.
 // The interpolatedHourlyUsage array and its related calculations isn't working.
 // File loading code doesn't do enough error checking.
+// The code might need to reset the AMR after the initial received reading if it goes a long time
+//   without receiving anything (like 20+ minutes in my case).
 //
 //
 //
@@ -52,6 +54,12 @@
 // Change Daily Usage graph to color each bar or part of a bar the color of the Tier it represents
 // Cange Monthly Usage graph to color each bar segment the color of each Tier
 // Add code to change billing cycle start date and TIME to be an empirical time rather than midnight
+// Add a configuration file to store our user settings in so that we can make it easier for inexperienced users
+//   to put in their information. This would also make it possible to distribute an executable of the sketch. And
+//   ideally we might present the user with a form of a dialog to present them with a list of received meter serial
+//   numbers to let them choose theirs from, and other settings, upon the very first launch. Then we create that
+//   configuration file for them so they can't mess it up (unless they manually mess with the file afterwards). Save
+//   the config file in the "data" folder so it's lets obvious. Call it preferences.txt ?
 //
 //
 //
@@ -64,6 +72,10 @@
 //    The conversion to git makes version numbers mostly irrelavent, so I removed it from the file name until I
 //      learn how the "Pros" handle this
 //    Added LICENSE.txt file with Apache License 2.0 in it
+//    Added a quick error check on load24HourLog() to see if hourLog.txt exists. If it doesn't then zero our the
+//      cumulativeHourlyUsage array. But this causes a problem on the Hourly Usage graph since it now ranges from
+//      0 to the current kWh reading, which could be tens of thousands.
+//    Added a quick error checks on loadDailyLog() and loadMonthLog()
 //
 // 20 August 2011 b06
 //    Preparation for release to the public. Added Apache License 2.0. Cleaned up code.
