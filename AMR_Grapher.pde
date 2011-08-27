@@ -100,6 +100,9 @@ int     longestLOS   = 0;             // The longest time, in millis, that we we
 
 // String  os = System.getProperty("os.name"); // We'll use this to let us know which path for serial and image saving is appropriate based on operating system
 
+String separator = System.getProperty("file.separator"); // Mac and Linux should be "/", Windows should be "\" I think
+// We'll use this when we need to traverse a directory, like when saving/reading to/from the "data" folder inside of our sketch folder
+
 
 
 
@@ -153,6 +156,8 @@ void setup () {
   
   
   load24HourLog();
+  
+  loadLastUpdateTimestamp();
   
   // Calculate our hourlyUsage based on our newly loaded data
   calculateUsage(24);

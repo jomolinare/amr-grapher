@@ -1,5 +1,6 @@
 // KNOWN ISSUES
 //
+// All code is written on a Mac and is biased that way. Paths may not be cross-platform (Yet)!
 // The code currently makes no effort to handle Daylight Savings Time changes, but I believe
 //   that this will only cause cosmetic problems on the two days that time changes.
 // The code only handles ONE meter reading and it's assumed to be an electric meter, although
@@ -72,10 +73,17 @@
 //    The conversion to git makes version numbers mostly irrelavent, so I removed it from the file name until I
 //      learn how the "Pros" handle this
 //    Added LICENSE.txt file with Apache License 2.0 in it
-//    Added a quick error check on load24HourLog() to see if hourLog.txt exists. If it doesn't then zero our the
-//      cumulativeHourlyUsage array. But this causes a problem on the Hourly Usage graph since it now ranges from
-//      0 to the current kWh reading, which could be tens of thousands.
+//    Added a quick error check on load24HourLog() to see if hourLog.txt exists. If it doesn't then fill the
+//      cumulativeHourlyUsage array with -1000 to indicate invalid data. But this causes a problem on the
+//      Hourly Usage graph since it now ranges from -1000 to the current kWh reading, which could be tens of thousands.
+//      But the -1000 value should eventually be used by the drawGraph() function to know it's invalid and react properly.
 //    Added a quick error checks on loadDailyLog() and loadMonthLog()
+//    Added separator variable that is the OS file separator, or path separator, and we use it when we save or load files
+//      and want to make sure it is as cross platform aware as possible.
+//    Added code to save/load lastUpdateTimestamp.txt that will help us know how long the sketch was inactive
+//      and make changes to our graph accordingly, so there aren't big jumps in usage on the graph.
+//    Added code to fix the problem that the -1000 values caused on the graph code.
+//    Tested the Tier graph with large values and fixed it so Tier 3 and others show fine now.
 //
 // 20 August 2011 b06
 //    Preparation for release to the public. Added Apache License 2.0. Cleaned up code.

@@ -52,8 +52,13 @@ void drawGraph(float[] usage, int startX, int startY, int w, int h, int hilite, 
   for (int i = 0; i < usage.length; i++) {
     float x = (i * barWidth) + barPad + startX;
     float y = 0; // Initialize this so we can use it below without errors
-    if (usage[i] == 0) {
-      // It's 0, but we should "pad" it to our baselineUsage figure so the graph is visible
+    if (usage[i] == -1000) {
+      // If it's -1000, which is an invalid value, we'll make it be zero height
+      y = map(0, 0, maxHeight, 0, h);
+    }
+    else if (usage[i] == 0) {
+      // It's 0, which is equivalent to "no data yet," but we should "pad" it
+      //   to our baselineUsage figure so the graph is visible
       y = map(baselineUsage, 0, maxHeight, 0, h);
     }
     else {
@@ -152,24 +157,23 @@ void drawTierGraph(int startX, int startY, int w, int h) {
   // Assuming 3 Tiers: 0-500, 501-1000, 1001+
   // Since the first 2 tiers are 500 kWh wide, if tier 3 happens to be more than 500 then
   //   we'll have to scale tier 1 and 2 down.
+  // If we end up with a user configurable set of tiers we'll have to update this
+  //   to reflect the user settings.
 
   textAlign(CENTER);
   textFont(bigFont);
 
-  // Make a "background" rectangle that will surround our bar graphs,
-  //  stretching or shrinking to contain all of our tiers
-  noFill();
+  // Draw a couple lines to "enclose" our horizontal bar graph
   stroke(128);
-  switch (currentTier) {
-  case 1:
-    rect(startX, startY - 1, w-1, h/3 + 1);
-    break;
-  case 2:
-    rect(startX, startY - 1, w-1, (h/3) * 2 + 1);
-    break;
-  case 3:
-    rect(startX, startY - 1, w-1, h + 1);
-  }
+  line(startX, startY-1, width, startY-1);
+  line(startX, startY+h, width, startY+h);
+  // Draw some more lines in decreasing darkness to simulate a drop shadow
+  stroke(160);
+  line(startX, startY+h+1, width, startY+h+1);
+  stroke(200);
+  line(startX, startY+h+2, width, startY+h+2);
+  stroke(240);
+  line(startX, startY+h+3, width, startY+h+3);
 
 
   // Tier 1
@@ -187,9 +191,6 @@ void drawTierGraph(int startX, int startY, int w, int h) {
     fill(0, 255, 0); // Green
     noStroke();
     rect(startX, startY, tierW, h/3);
-    
-    fill(0);
-    text ("Current Tier: " + currentTier, width/2, startY + (h / 3));
   }
 
   // Tier 2
@@ -205,9 +206,6 @@ void drawTierGraph(int startX, int startY, int w, int h) {
     fill(255, 255, 0); // Yellow
     noStroke();
     rect(startX, startY + (h/3), tierW, h/3);
-    
-    fill(0);
-    text ("Current Tier: " + currentTier, width/2, startY + (h / 2) + 14);
   }
 
   // Tier 3
@@ -217,13 +215,12 @@ void drawTierGraph(int startX, int startY, int w, int h) {
     fill(255, 0, 0); // Red
     noStroke();
     rect(startX, startY + ((h/3) * 2), tierW, h/3);
-    
-    fill(0);
-    text ("Current Tier: " + currentTier, width/2, startY + (h / 2) + 26);
   }
-  // Tier 3 graph is currently untested since I haven't had any Tier 3 usage, nor have I "faked" it for testing.
-  //  Need to test this!
-  // Also, if Tier 3 ever grows beyond 500 kWh wide it'd be nice to keep it 100% width, but then scale down both
+  
+  fill(0);
+  text ("Current Tier: " + currentTier, width/2, startY + (h / 2) + 8);
+  
+  // If Tier 3 ever grows beyond 500 kWh wide it'd be nice to keep it 100% width, but then scale down both
   //  tier 1 and 2 graph widths proportionly (make them narrower). Alternatively, we could probably add a
   //  fourth or fifth bar graph line underneath Tier 3.
 }

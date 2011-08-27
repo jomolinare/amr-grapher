@@ -12,7 +12,7 @@ void saveMinuteLog() {
   String minuteLog = nf(month(), 2) +"/"+ nf(day(), 2)+"/"+year()+","+nf(hour(), 2)+":"+nf(minute(), 2)+","+currentkWhReading;
   try
   {
-    file = new FileWriter(sketchPath + "/AMR_Log.csv", true); // Boolean tells to append
+    file = new FileWriter(sketchPath + separator + "AMR_Log.csv", true); // Boolean tells to append
     file.write("\n" + minuteLog, 0, minuteLog.length()+1);  // (string, start char, end char)
     file.close();
     if (debug) { println("Wrote to AMR_Log.csv file."); }
@@ -41,7 +41,7 @@ void save24HourLog() {
   }
   try
   {
-    file = new FileWriter(sketchPath + "/hourLog.txt", false); // False says overwrite the file contents
+    file = new FileWriter(sketchPath + separator + "data" + separator + "hourLog.txt", false); // False says overwrite the file contents
     file.write(hourLog, 0, hourLog.length());
     file.close();
     if (debug) { println("Wrote to hourLog file."); }
@@ -52,13 +52,14 @@ void save24HourLog() {
 
 
 void load24HourLog() {
-  String[] strings = loadStrings("hourLog.txt");
+  String[] strings = loadStrings(separator + "data" + separator + "hourLog.txt");
   if (strings == null) {
     // We had a failure loading the file (it might not exist),
     //   so let's fill in our cumulativeHourlyUsage array with zeros
     println("hourLog.txt NOT successfully loaded.");
     for (int i = 0; i < 24; i++) {
-      cumulativeHourlyUsage[i] = 0;
+      // Use -1000 to indicate that we don't have data
+      cumulativeHourlyUsage[i] = -1000;
     }
   }
   else {
@@ -85,7 +86,7 @@ void saveDailyLog() {
   dayLog = dayLog + (currentkWhReading - midnightUsage);                    // "DayTotalkWh"
   try
   {
-    file = new FileWriter(sketchPath + "/kWh-usage-daily.csv", true); // True says to append to the file
+    file = new FileWriter(sketchPath + separator + "kWh-usage-daily.csv", true); // True says to append to the file
     file.write(dayLog, 0, dayLog.length());
     file.close();
     if (debug) { println("Wrote to the dayLog file."); }
@@ -98,12 +99,18 @@ void loadDailyLog() {
   if (strings == null) {
     println("kWh-usage-daily.csv NOT successfully loaded.");
     for (int i = 0; i < 31; i++) {
-      dailyUsage[i] = 0;
+      // Use -1000 to indicate that we don't have data
+      dailyUsage[i] = -1000;
     }
   }
   else {
     strings = expand(strings, strings.length+1); // Expand the array by 1 (strings.length automatically gives us 1 more than the length when counting from 0)
-    strings[strings.length - 1] = ",," + (currentkWhReading - midnightUsage); // Update the last value on the array to be our usage today so far
+    if (midnightUsage == -1000) {
+      strings[strings.length - 1] = ",,0"; // Update the last value in the array to be 0 since we don't have a valid start usage from midnight
+    }
+    else {
+      strings[strings.length - 1] = ",," + (currentkWhReading - midnightUsage); // Update the last value in the array to be our usage today so far
+    }
     strings = reverse(strings);
     strings = shorten(strings); // Remove the header line from the array
     if (strings.length > 31) { // We have more than a month of data so we need to remove older data
@@ -148,7 +155,7 @@ void saveMonthLog() {
   //  need to add in that value manually once the utility bill has been received.
   try
   {
-    file = new FileWriter(sketchPath + "/kWh-usage-monthly.csv", true); // True says to append to the file
+    file = new FileWriter(sketchPath + separator + "kWh-usage-monthly.csv", true); // True says to append to the file
     file.write(monthLog, 0, monthLog.length());
     file.close();
     if (debug) { println("Wrote to kWh-usage-monthly.csv file."); }
@@ -162,7 +169,8 @@ void loadMonthLog() {
   if (strings == null) {
     println("kWh-usage-daily.csv NOT successfully loaded.");
     for (int i = 0; i < 24; i++) {
-      monthlyUsage[i] = 0;
+      // Use -1000 to indicate that we don't have data
+      monthlyUsage[i] = -1000;
     }
   }
   else {
@@ -196,5 +204,65 @@ void loadMonthLog() {
 
 // IMAGE FILE ------------------------------------------------------------------------
 void saveWindowImage() {
-  save(sketchPath + "/graph.png");
+  save(sketchPath + separator + "graph.png");
+}
+
+
+
+// LAST UPDATE TIMESTAMP FILE --------------------------------------------------------
+void saveLastUpdateTimestamp() {
+  FileWriter lastUpdateTimestamp;
+  try
+  {
+    String timeStamp = str(year()) + "/" + str(month()) + "/" + str(day()) + "," + str(hour()) + ":" + str(minute());
+    // The str() functions will turn the numbers into strings so we won't throw an error.
+    // Also, the above string will give us times like 0:0 at midnight, but we don't care since we're not displaying it.
+    lastUpdateTimestamp = new FileWriter(sketchPath + separator + "data" + separator + "lastUpdateTimestamp.txt", false); // Open the file, false == overwrite file
+    lastUpdateTimestamp.write(timeStamp, 0, timeStamp.length()); // Write our timestamp to the file
+    lastUpdateTimestamp.close(); // Close the file
+  }
+  catch(Exception e)
+  {
+    println("Error: Can't open 'lastUpdateTimestamp.txt' file to save to!");
+  }
+}
+
+void loadLastUpdateTimestamp() {
+  String[] strings = loadStrings(separator + "data" + separator + "lastUpdateTimestamp.txt");
+  if (strings == null) {
+    println("lastUpdateTimestamp.txt NOT successfully loaded.");
+    for (int i = 0; i < 24; i++) {
+      // We don't know when the last time the sketch was run, maybe never,
+      //   so we'll fill the cumulativeHourlyUsage array with -1000 to
+      //   indicate we don't have valid data.
+      cumulativeHourlyUsage[i] = -1000;
+    }
+  }
+  else {
+    // Loaded successfully
+    if (debug) { println("lastUpdateTimestamp.txt successfully loaded."); }
+    String[] separated = split(strings[0], ","); // strings[0] since there should only be 1 line in the file
+    int[] dateStamp = parseInt(split(separated[0], "/")); // Split up the date string: [0]==Year [1]==Month [2]==Day
+    int[] timeStamp = parseInt(split(separated[1], ":")); // Split up the time string: [0]==Hour [1]==Minute
+    if (dateStamp[0] == year() && dateStamp[1] == month() && dateStamp[2] == day()) {
+      // The last timestamp was from today, so we've run the sketch today
+      // Let's test if it was recent
+      if (timeStamp[0] == hour()) { // Ignore the minute for now, we're not that fine grained
+        // We last ran this sketch during this hour so we can use our cumulativeHourlyUsage[] data without modification
+      }
+      else {
+        // We need to clear out data from the last x hours since it's invalid data from yesterday
+        for (int i = timeStamp[0]; i < hour(); i++) {
+          cumulativeHourlyUsage[i] = -1000;
+        }
+      }
+    }
+    else {
+      // The datestamp was prior to 00:00:01 today. We need to see if it was less than 24 hours ago
+      //   though since there might still be valid data from before midnight.
+      // If the data is older than 24 hours old then we'll need to zero out cumulativeHourlyUsage[].
+      // Ideally, we'll want to "spread" the kWh usage between now and our last timestamp across
+      //   the last x hours so that the graph doesn't spike.
+    }
+  }
 }

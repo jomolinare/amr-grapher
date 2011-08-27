@@ -48,22 +48,32 @@ void calculateUsage(int range) {
     // If we haven't then we won't replace cumulativeHourlyUsage[hour()] with our saveString, we'll
     //  just leave the data we pulled in from out hourly log file.
     cumulativeHourlyUsage[hour()] = currentkWhReading;
+    //cumulativeHourlyUsage[hour()] = -1000; // Let's try this instead
   }
   if (range == 24) {
     for (int i = 0; i < range; i++) {
       // Then let's calculate how much we used during the past hour by getting the difference between the last two hours
-      if (i == 0) {
-        // It's the first hour of the day, so we need to "Wrap around" to the previous days data
-        hourlyUsage[i] = cumulativeHourlyUsage[i] - cumulativeHourlyUsage[23];
-      } 
-      else {
-        // It's not the last hour of the day, calculate it normally
-        hourlyUsage[i] = cumulativeHourlyUsage[i] - cumulativeHourlyUsage[i - 1];
+      if (cumulativeHourlyUsage[i] == -1000) {
+        // We have invalid data in cumulativeHourlyUsage and need to "transfer" that to hourlyUsage
+        //   also so that the graph will display the invalid data properly.
+        hourlyUsage[i] = -1000;
       }
-      if (hourlyUsage[i] < 0) {
-        // We're subtracting one day from another, resulting in a negative number. This is invalid
-        //  so we zero it out manually.
-        hourlyUsage[i] = 0;
+      else {
+        if (i == 0) {
+          // It's the first hour of the day, so we need to "Wrap around" to the previous days data
+          hourlyUsage[i] = cumulativeHourlyUsage[i] - cumulativeHourlyUsage[23];
+        } 
+        else {
+          // It's not the last hour of the day, calculate it normally
+          hourlyUsage[i] = cumulativeHourlyUsage[i] - cumulativeHourlyUsage[i - 1];
+        }
+        if (hourlyUsage[i] < 0 || cumulativeHourlyUsage[i] == currentkWhReading) {
+          // We're subtracting one day from another, resulting in a negative number. This is invalid
+          //   so we zero it out manually.
+          // Or if our cumulativeHourlyUsage is the same as our currentkWhReading, which exists when
+          //   when we haven't been running the sketch recently, we also zero it out.
+          hourlyUsage[i] = 0;
+        }
       }
     }
   }

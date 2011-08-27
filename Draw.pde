@@ -44,7 +44,13 @@ void draw () {
   
   /////////////////////////////  ONLY DO THE FOLLOWING CODE IF WE HAVE A VALID KWH READING /////////////////////////////
   if (currentkWhReading != 0) {
-    dailyUsage[30]   = currentkWhReading - midnightUsage; // Update the dailyUsage for today for the graph to use
+    if (midnightUsage == -1000) {
+      dailyUsage[30] = 0; // Update the dailyUsage for today to be 0 since we don't have a valid start usage from midnight
+    }
+    else {
+      dailyUsage[30] = currentkWhReading - midnightUsage; // Update the dailyUsage for today for the graph to use
+    }
+    //dailyUsage[30]   = currentkWhReading - midnightUsage; // Update the dailyUsage for today for the graph to use
     monthlyUsage[23] = usageThisCycle;                    // Update the monthlyUsage for this month for the graph to use
     
     // We're drawing the graphs first so that they're behind our other elements
@@ -52,7 +58,7 @@ void draw () {
     drawGraph(hourlyUsage,      5,    200,  width - 20,          125,           hour(), "Hourly Usage:");
     drawGraph(dailyUsage,       5,    390,  width - 20,          200,               30, "Daily Usage for past month:");
     drawGraph(monthlyUsage,     5,    675,  width - 20,          200,               23, "Monthly Usage for past 2 years:");
-    drawTierGraph(0, 60, width, 50);
+    drawTierGraph(0, 60, width, 25);
 
     if (second() == 0 && minute() % 5 == 0) { // Every 5 minutes
       if (wroteToLog == true || currentkWhReading == 0) {   // We've already written to the log during this current second, don't do it again, or we don't have valid data to save
@@ -62,6 +68,8 @@ void draw () {
         saveWindowImage();
         wroteToLog = true;  // Indicate we've written to the log on the first time so that we don't write 59 more log entries during
         //                  //   the one second that our max 60 fps gives us. Luckily we're doing 1fps and shouldn't need this, but just in case
+        
+        saveLastUpdateTimestamp();
         
         fill(255, 0, 0);    // Red
         ellipse(width - 20, height - 20, 15, 15); // Make a little "record" symbol in the bottom right corner to say we're writing to the log
@@ -83,7 +91,7 @@ void draw () {
     textAlign(RIGHT);
     text (nf(currentkWhReading - midnightUsage, 0, 0) + " kWh so far today.", width - 10, 27);
     textAlign(LEFT);
-    text ("So far this month: " + nf(usageThisCycle, 0, 0) + " kWh", 10, 27);
+    text ("So far this month: " + nfc(usageThisCycle, 0) + " kWh", 10, 27);
     textAlign(RIGHT);
     if (currencyBefore) {
       text (currencySymbol + nf(billToday, 0, 2) + " so far today.", width - 10, 52);
@@ -107,6 +115,13 @@ void draw () {
         billingCycleStartUsage = currentkWhReading;
       }
     }
+    
+    if (billingCycleStartUsage == 0) {
+      // If we loaded up the sketch and couldn't load the log files, or they didn't have enough info
+      //   in them to get our billingCycleStartUsage, then we'll just make it the current reading
+      //   so we have a more "sane" number.
+      billingCycleStartUsage = currentkWhReading;
+    }
 
     if (minute() == 0 && second() == 1) {
       save24HourLog();
@@ -121,6 +136,13 @@ void draw () {
     text("from the AMR...", width/2, height/2 + 22);
   }
   
+  if (debug) {
+    // Indicate we're in debug mode
+    textFont(bigFont);
+    textAlign(LEFT);
+    fill(255, 0, 0);
+    text("Debug Mode", 10, 154);
+  }
   
   // Then draw the resulting time in millis() to show how long it took to go through our draw() loop
   textFont(smallFont);

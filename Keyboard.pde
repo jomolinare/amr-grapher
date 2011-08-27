@@ -2,10 +2,12 @@ void keyPressed() {
   if (key == 'g' || key == 'G') {
     // For debugging let's print our arrays out
     println("hour()=" + hour() + "  day()=" + day());
+    print("cumulative:  ");
     for (int i = 0; i < 24; i++ ) {
       print(nfs(cumulativeHourlyUsage[i], 5, 1) + " ");
     }
     println();
+    print("hourlyUsage: ");
     for (int i = 0; i < 24; i++ ) {
       print(nfs(hourlyUsage[i], 5, 1) + " ");
     }
@@ -14,10 +16,12 @@ void keyPressed() {
     //  print(nfs(interpolatedHourlyUsage[i], 5, 1) + " ");
     //}
     //println();
+    print("dailyUsage:   ");
     for (int i = 0; i < 31; i++ ) {
       print(nf(dailyUsage[i], 2, 0) + " ");
     }
     println();
+    print("monthlyUsage: ");
     for (int i = 0; i < 24; i++ ) {
       print(nf(monthlyUsage[i], 3, 0) + " ");
     }
@@ -39,5 +43,10 @@ void keyPressed() {
   
   if (key == 's' || key == 'S') {
     saveWindowImage();
+  }
+  
+  if (key == 'c' || key == 'C') {
+    calculateBilling();
+    calculateUsage(24);
   }
 }
