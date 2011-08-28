@@ -71,6 +71,13 @@ PFont   bigFont;
 PFont   smallFont;
 PFont   tinyFont;
 
+// Operating System detection and settings
+String operatingSystem = System.getProperty("os.name"); // We'll use this to let us know which path for serial and image saving is appropriate based on operating system
+String separator       = System.getProperty("file.separator"); // Mac and Linux should be "/", Windows should be "\" I think
+//     We'll use this when we need to traverse a directory, like when saving/reading to/from the "data" folder inside of our sketch folder
+String serialPath      = "/dev/tty.usbmodem"; // Default to the Mac path since that's what I'm using, but it may be overwritten in setup() depending on OS
+//     We'll then use an if/then to figure out what option we should use based on operatingSystem, in setup()
+
 
 // Billing section.
 float   midnightUsage          = 0;     // Stores our cumulative kWh at midnight so we can calculate our total usage today
@@ -98,10 +105,6 @@ float[] cumulativeHourlyUsage   = new float[24]; // Stores our total kWh usage, 
 int     lastContact  = 0;             // The last time, in millis, that we received data from the AMR
 int     longestLOS   = 0;             // The longest time, in millis, that we went without signal from the AMR (LOS=Loss Of Signal)
 
-// String  os = System.getProperty("os.name"); // We'll use this to let us know which path for serial and image saving is appropriate based on operating system
-
-String separator = System.getProperty("file.separator"); // Mac and Linux should be "/", Windows should be "\" I think
-// We'll use this when we need to traverse a directory, like when saving/reading to/from the "data" folder inside of our sketch folder
 
 
 
@@ -119,12 +122,23 @@ void setup () {
     println(Serial.list());
   }
   
+  // Set the serialPath depending on the operating system we're running on
+  if (operatingSystem.equals("Linux")) {
+    serialPath = "/dev/ttyACM0";
+  }
+  else if (operatingSystem.equals("Mac OS X")) {
+    serialPath = "/dev/tty.usbmodem";
+  }
+  else {
+    serialPath = "COM1"; // Not sure if this is correct, Windows folks let me know please!
+  }
+  
   // Try to auto select the correct port based on its path
   // This needs be be updated to make sure it will work with Linux and Windows,
   //   probably by just adding two more path names to the match() test.
   String[] ports = Serial.list();                         // Store a list of available serial ports
   for (int i = 0; i < ports.length; i++) {                // Loop through those available serial ports
-    if (match(ports[i], "/dev/tty.usbmodem") != null) {   // If one of those ports starts with /dev/tty.usbmodem...
+    if (match(ports[i], serialPath) != null) {            // If one of those ports contains the text of serialPath
       AMRport = new Serial(this, Serial.list()[i], 9600); // Then save that port as our AMRport
       break;                                              // And break out of the for loop since we found our desired port
     }

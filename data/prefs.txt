@@ -1,0 +1,10 @@
+meterSerialNumber,37287446
+billingCycleStartDay,15
+currencySymbol,$
+currencyBefore,true
+tier1rate,0.1083
+tier2rate,0.1541
+tier3rate,0.1756
+kWhSurcharges,0.00529
+basicService,10.0
+baselineUsage,0.167

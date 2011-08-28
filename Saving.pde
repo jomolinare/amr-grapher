@@ -7,7 +7,7 @@ void saveMinuteLog() {
   //  MM/DD/YYYY,HH:MM,Usage
   //
   // We don't have a function to load this file back in because we don't want/need to.
-  
+
   FileWriter file;
   String minuteLog = nf(month(), 2) +"/"+ nf(day(), 2)+"/"+year()+","+nf(hour(), 2)+":"+nf(minute(), 2)+","+currentkWhReading;
   try
@@ -15,9 +15,13 @@ void saveMinuteLog() {
     file = new FileWriter(sketchPath + separator + "AMR_Log.csv", true); // Boolean tells to append
     file.write("\n" + minuteLog, 0, minuteLog.length()+1);  // (string, start char, end char)
     file.close();
-    if (debug) { println("Wrote to AMR_Log.csv file."); }
+    if (debug) { 
+      println("Wrote to AMR_Log.csv file.");
+    }
   }
-  catch(Exception e) { println("Error: Can't open AMR_Log.csv file!"); }
+  catch(Exception e) { 
+    println("Error: Can't open AMR_Log.csv file!");
+  }
 }
 
 
@@ -29,7 +33,7 @@ void save24HourLog() {
   // Each line in the file will consist of a single value, the kWh, in float format.
   // Each line in the file will equate to one hour, starting at 0 (midnight 12:00-12:59am)
   //   and ending at 23 (11:59pm).
-  
+
   FileWriter file;
   String hourLog = "";
   for (int i = 0; i < 24; i++) {
@@ -44,9 +48,13 @@ void save24HourLog() {
     file = new FileWriter(sketchPath + separator + "data" + separator + "hourLog.txt", false); // False says overwrite the file contents
     file.write(hourLog, 0, hourLog.length());
     file.close();
-    if (debug) { println("Wrote to hourLog file."); }
+    if (debug) { 
+      println("Wrote to hourLog file.");
+    }
   }
-  catch(Exception e) { println("Error: Can't open hourLog.txt file!"); }
+  catch(Exception e) { 
+    println("Error: Can't open hourLog.txt file!");
+  }
 }
 
 
@@ -63,7 +71,9 @@ void load24HourLog() {
     }
   }
   else {
-    if (debug) { println("hourLog.txt successfully loaded."); }
+    if (debug) { 
+      println("hourLog.txt successfully loaded.");
+    }
     for (int i = 0; i < strings.length; i++) {
       cumulativeHourlyUsage[i] = parseFloat(strings[i]);
     }
@@ -78,7 +88,7 @@ void saveDailyLog() {
   // kWh-usage-daily.csv format:
   // MM/DD/YYYY,EndOfDaykWhReading,DayTotalkWh
   // Note: since my meter doesn't do decimal kWh I've stripped it from the output here
-  
+
   FileWriter file;
   String dayLog = ""; // Initialize the single-line string we'll be appending to the file
   dayLog = "\n" + nf(month(), 2) + "/" + nf(day(), 2) + "/" + year() + ","; // Newline + "DD/MM/YYYY,"
@@ -89,9 +99,13 @@ void saveDailyLog() {
     file = new FileWriter(sketchPath + separator + "kWh-usage-daily.csv", true); // True says to append to the file
     file.write(dayLog, 0, dayLog.length());
     file.close();
-    if (debug) { println("Wrote to the dayLog file."); }
+    if (debug) { 
+      println("Wrote to the dayLog file.");
+    }
   }
-  catch(Exception e) { println("Error: Can't open kWh-usage-daily.csv"); }
+  catch(Exception e) { 
+    println("Error: Can't open kWh-usage-daily.csv");
+  }
 }
 
 void loadDailyLog() {
@@ -131,7 +145,9 @@ void loadDailyLog() {
       dailyUsage[i] = parseFloat(cells[2]);    // cells[2] should be DayTotalkWh
     }
     dailyUsage = reverse(dailyUsage);
-    if (debug) { println("kWh-usage-daily.csv successfully loaded."); }
+    if (debug) { 
+      println("kWh-usage-daily.csv successfully loaded.");
+    }
   }
 }
 
@@ -144,7 +160,7 @@ void saveMonthLog() {
   // kWh-usage-monthly.csv format:
   // MM/DD/YYYY,EndOfMonthkWhReading,MonthTotalkWh,EstimatedCost,ActualkWh,ActualCost
   // Note: since my meter doesn't do decimal kWh I've stripped it from the output here
-  
+
   FileWriter file;
   String monthLog = "";
   monthLog = "\n" + nf(month(), 2) + "/" + nf(day(), 2) + "/" + year() + ",";    // Newline + "DD/MM/YYYY,"
@@ -158,9 +174,13 @@ void saveMonthLog() {
     file = new FileWriter(sketchPath + separator + "kWh-usage-monthly.csv", true); // True says to append to the file
     file.write(monthLog, 0, monthLog.length());
     file.close();
-    if (debug) { println("Wrote to kWh-usage-monthly.csv file."); }
+    if (debug) { 
+      println("Wrote to kWh-usage-monthly.csv file.");
+    }
   }
-  catch(Exception e) { println("Error: Can't open kWh-usage-monthly.csv file!"); }
+  catch(Exception e) { 
+    println("Error: Can't open kWh-usage-monthly.csv file!");
+  }
 }
 
 
@@ -196,7 +216,9 @@ void loadMonthLog() {
       monthlyUsage[i] = parseFloat(cells[2]);  // cells[2] should be MonthTotalkWh
     }
     monthlyUsage = reverse(monthlyUsage);
-    if (debug) { println("kWh-usage-daily.csv successfully loaded."); }
+    if (debug) { 
+      println("kWh-usage-daily.csv successfully loaded.");
+    }
   }
 }
 
@@ -240,7 +262,9 @@ void loadLastUpdateTimestamp() {
   }
   else {
     // Loaded successfully
-    if (debug) { println("lastUpdateTimestamp.txt successfully loaded."); }
+    if (debug) { 
+      println("lastUpdateTimestamp.txt successfully loaded.");
+    }
     String[] separated = split(strings[0], ","); // strings[0] since there should only be 1 line in the file
     int[] dateStamp = parseInt(split(separated[0], "/")); // Split up the date string: [0]==Year [1]==Month [2]==Day
     int[] timeStamp = parseInt(split(separated[1], ":")); // Split up the time string: [0]==Hour [1]==Minute
@@ -266,3 +290,114 @@ void loadLastUpdateTimestamp() {
     }
   }
 }
+
+
+
+// USER PREFERENCES -------------------------------------------------------------------
+void saveUserPrefs() {
+  FileWriter userPrefsFile;
+  try
+  {
+    String prefsText = "meterSerialNumber," + meterSerialNumber + "\n";
+    prefsText = prefsText + "billingCycleStartDay," + billingCycleStartDay + "\n";
+    prefsText = prefsText + "currencySymbol," + currencySymbol + "\n";
+    prefsText = prefsText + "currencyBefore," + currencyBefore + "\n";
+    prefsText = prefsText + "tier1rate," + tier1rate + "\n";
+    prefsText = prefsText + "tier2rate," + tier2rate + "\n";
+    prefsText = prefsText + "tier3rate," + tier3rate + "\n";
+    prefsText = prefsText + "kWhSurcharges," + kWhSurcharges + "\n";
+    prefsText = prefsText + "basicService," + basicService + "\n";
+    prefsText = prefsText + "baselineUsage," + baselineUsage;
+
+    userPrefsFile = new FileWriter(sketchPath + separator + "data" + separator + "prefs.txt", false); // Open the file, false == overwrite file
+    userPrefsFile.write(prefsText, 0, prefsText.length()); // Write our prefs to the file
+    userPrefsFile.close(); // Close the file
+  }
+  catch(Exception e)
+  {
+    println("Error: Can't open 'prefs.txt' file to save to!");
+  }
+}
+
+void loadUserPrefs() {
+  String prefsText[] = loadStrings(separator + "data" + separator + "prefs.txt");
+  if (prefsText == null) {
+    println("prefs.txt NOT successfully loaded.");
+    // We'll just use the preset values hard coded into this sketch since we couldn't load the file
+
+    // BUT we should create a user interface to get these prefs from the user via our window
+    // AFTER we've first received *at least* one serial number from the AMR
+  }
+  else {
+    // Loaded successfully
+    if (debug) {
+      println("prefs.txt successfully loaded:");
+      println(prefsText);
+    }
+    for (int i = 0; i < prefsText.length; i++) {
+      String[] separated = split(prefsText[i], ","); // Split up our string into individual "cells" at the comma
+      if (separated[0].equals("meterSerialNumber")) {
+        meterSerialNumber = separated[1];
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("billingCycleStartDay")) {
+        billingCycleStartDay = parseInt(separated[1]);
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("currencySymbol")) {
+        currencySymbol = separated[1].charAt(0); // Use charAt as a kludgey way to convert String to char
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("currencyBefore")) {
+        currencyBefore = boolean(separated[1]);
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("tier1rate")) {
+        tier1rate = parseFloat(separated[1]);
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("tier2rate")) {
+        tier2rate = parseFloat(separated[1]);
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("tier3rate")) {
+        tier3rate = parseFloat(separated[1]);
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("kWhSurcharges")) {
+        kWhSurcharges = parseFloat(separated[1]);
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("basicService")) {
+        basicService = parseFloat(separated[1]);
+        continue; // Skip to the next for() iteration
+      }
+
+      if (separated[0].equals("baselineUsage")) {
+        baselineUsage = parseFloat(separated[1]);
+        continue; // Skip to the next for() iteration
+      }
+    }
+    if (debug) {
+      println(meterSerialNumber);
+      println(billingCycleStartDay);
+      println(currencySymbol);
+      println(currencyBefore);
+      println(tier1rate);
+      println(tier2rate);
+      println(tier3rate);
+      println(kWhSurcharges);
+      println(basicService);
+      println(baselineUsage);
+    }
+  }
+}
+

@@ -41,8 +41,15 @@ void keyPressed() {
     AMRReset();
   }
   
-  if (key == 's' || key == 'S') {
+  if (key == 's') {
     saveWindowImage();
+  }
+  
+  if (key == 'S') {
+    saveUserPrefs();
+  }
+  if (key == 'L') {
+    loadUserPrefs();
   }
   
   if (key == 'c' || key == 'C') {

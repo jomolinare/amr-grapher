@@ -1,14 +1,11 @@
 // KNOWN ISSUES
 //
-// All code is written on a Mac and is biased that way. Paths may not be cross-platform (Yet)!
 // The code currently makes no effort to handle Daylight Savings Time changes, but I believe
 //   that this will only cause cosmetic problems on the two days that time changes.
 // The code only handles ONE meter reading and it's assumed to be an electric meter, although
 //   you could simply tweak the display text of kWh to gallons or therms or whatever as a quick fix.
 // The sketch assumes SCM (Standard Consumption Messages) data from the AMR. It currently has
 //   no awareness of IDM (Interval Data Messages) and will probably choke on them if it receives them.
-// The sketch needs code and a file to keep track of the last time the sketch data was valid
-//   so that if the sketch is closed for more than a hour it won't use old data and mess up stuff.
 // I display the month names under the Monthly Usage graph, but in my case my billing cycle straddles
 //   the months. This makes it seem like the month name may be off if we're after the billing cycle
 //   clicks over to the next month, or similar in reverse. This may be a symantic problem that can't
@@ -19,7 +16,6 @@
 //   move to the nearest business day. We're not accounting for that, yet. It also flexes around
 //   holidays, and is sometimes randomly a day early/late for some reason. Also not accounted for.
 // The interpolatedHourlyUsage array and its related calculations isn't working.
-// File loading code doesn't do enough error checking.
 // The code might need to reset the AMR after the initial received reading if it goes a long time
 //   without receiving anything (like 20+ minutes in my case).
 //
@@ -30,7 +26,6 @@
 // Add an entire AMRUSB-1 control section to send and receive special commands to the unit via GUI
 //   including graphing the reception strength, frequencies graph, etc.
 // Add checks to see if we're receiving data. If we're not, then don't save it to logs as if it were accurate.
-// Make serial port auto select aware of Linux and Windows port paths and react accordingly
 // Properly handle meter looping of value from 99999 to 00000 or whatever it is (mine is 99999 to 0)
 // Make sure everything still works for people that have solar power where the meter may turn backwards
 // Add a daily log with total kWh per day, log a "rolling" 365 days for comparisons
@@ -44,8 +39,6 @@
 // Add code to determine the correct billing start date that flexes to the nearest business day, and an option to disable this
 // Add a curved line to represent the graph instead of, or in addition to, the bar graph
 // Add Pachube upload
-// Add code to save to and load from a file that stores our last data save time/date so we can invalidate info from
-//   hourLog.txt if it's been more than an hour since we last ran the sketch
 // Create buffer images for the graphs to speed up drawing
 // Maybe change the every 5 minute log (or add another log) that only logs the time when a kWh ticks over to the next one
 //   if it has been over x minutes (since sometimes I get readings from my meter every couple seconds and that'd be WAY
@@ -53,7 +46,7 @@
 // Add a dollar figure to each line of the Tier graph that's the # of kWh X $/kWh (don't add the baseline fees)
 // Log files should generate header lines and save them to the file if the file didn't yet exist
 // Change Daily Usage graph to color each bar or part of a bar the color of the Tier it represents
-// Cange Monthly Usage graph to color each bar segment the color of each Tier
+// Change Monthly Usage graph to color each bar segment the color of each Tier
 // Add code to change billing cycle start date and TIME to be an empirical time rather than midnight
 // Add a configuration file to store our user settings in so that we can make it easier for inexperienced users
 //   to put in their information. This would also make it possible to distribute an executable of the sketch. And
@@ -66,6 +59,11 @@
 //
 // VERSION HISTORY
 //
+// 27 August 2011
+//    Add code to automatically set the serial port path based on operating system, but Windows is untested!
+//    (May need to follow https://forum.processing.org/topic/serial-list-returns-no-values to fix RXTX problem on Linux.
+//       I also needed to install librxtx-java [2.2pre2-3 in this case] on my Ubuntu installation.)
+//    Added save/load user preferences file. Still need to create a way for user to set them via GUI though.
 //
 // 26 August 2011
 //    Converted project to be tracked by git so it could easily be uploaded to Google Code project site, located
