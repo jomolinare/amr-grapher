@@ -62,10 +62,16 @@ void calculateUsage(int range) {
         if (i == 0) {
           // It's the first hour of the day, so we need to "Wrap around" to the previous days data
           hourlyUsage[i] = cumulativeHourlyUsage[i] - cumulativeHourlyUsage[23];
+          if (cumulativeHourlyUsage[23] == -1000) {
+            hourlyUsage[i] = -1000;
+          }
         } 
         else {
           // It's not the last hour of the day, calculate it normally
           hourlyUsage[i] = cumulativeHourlyUsage[i] - cumulativeHourlyUsage[i - 1];
+          if (cumulativeHourlyUsage[i - 1] == -1000) {
+            hourlyUsage[i] = -1000;
+          }
         }
         if (hourlyUsage[i] < 0 || cumulativeHourlyUsage[i] == currentkWhReading) {
           // We're subtracting one day from another, resulting in a negative number. This is invalid

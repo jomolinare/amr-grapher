@@ -36,10 +36,10 @@ void serialEvent (Serial AMRport) {
 
 void AMRSetup() {
   AMRport.write("FULL OFF\n");
-  delay(250);
-  AMRport.write("RBKT\n");
-  delay(250);
-  AMRport.write("WGHT 5\n");
+//  delay(250);
+//  AMRport.write("RBKT\n");
+//  delay(250);
+//  AMRport.write("WGHT 5\n");
 }
 
 void AMRReset() {

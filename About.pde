@@ -8,7 +8,7 @@
 //   no awareness of IDM (Interval Data Messages) and will probably choke on them if it receives them.
 // I display the month names under the Monthly Usage graph, but in my case my billing cycle straddles
 //   the months. This makes it seem like the month name may be off if we're after the billing cycle
-//   clicks over to the next month, or similar in reverse. This may be a symantic problem that can't
+//   clicks over to the next month, or similar in reverse. This may be a semantic problem that can't
 //   easily be worked around.
 // I live in the United States of America and I'm hence biased to our conventions. Feedback from
 //   other users from other countries would be appreciated to make this sketch more globally friendly.
@@ -35,7 +35,7 @@
 // Since my meter only has a 1kWh resolution I'm also only using 24 hours for each "usage bucket". Finer resolutions,
 //   or high usage situations might need or want more "usage buckets" per day, like 48 half-hours.
 // Add easily customizable tier kWh levels. I'm sure not every company uses 500, 1000, 1001+ like mine.
-// Evenatully add support for "time of use" meters, which would affect billing rates per time of day.
+// Eventually add support for "time of use" meters, which would affect billing rates per time of day.
 // Add code to determine the correct billing start date that flexes to the nearest business day, and an option to disable this
 // Add a curved line to represent the graph instead of, or in addition to, the bar graph
 // Add Pachube upload
