@@ -60,32 +60,6 @@ void draw () {
     drawGraph(monthlyUsage,     5,    675,  width - 20,          200,               23, "Monthly Usage for past 2 years:");
     drawTierGraph(0, 60, width, 25);
 
-    if (second() == 0 && minute() % 5 == 0) { // Every 5 minutes
-      if (wroteToLog == true || currentkWhReading == 0) {   // We've already written to the log during this current second, don't do it again, or we don't have valid data to save
-      } 
-      else {
-        saveMinuteLog();
-        saveWindowImage();
-        wroteToLog = true;  // Indicate we've written to the log on the first time so that we don't write 59 more log entries during
-        //                  //   the one second that our max 60 fps gives us. Luckily we're doing 1fps and shouldn't need this, but just in case
-        
-        saveLastUpdateTimestamp();
-        
-        fill(255, 0, 0);    // Red
-        ellipse(width - 20, height - 20, 15, 15); // Make a little "record" symbol in the bottom right corner to say we're writing to the log
-        calculateBilling(); // Also update our billing numbers
-        calculateUsage(24); // This would probably be better as 1 instead of 24, but it takes so little to process we might as well do 24
-      }
-    } 
-    else {
-      wroteToLog = false;   // If we're not at the proper second then don't log and write false so we're ready when it is the proper second
-    }
-
-    if (hour() == 0 && minute() == 0 && second() == 0) { // Midnight
-      // It's a new day so we need to update our usage for the day by storing our current usage
-      midnightUsage = currentkWhReading;
-    }
-
     fill(0);
     textFont(bigFont);
     textAlign(RIGHT);
@@ -126,6 +100,34 @@ void draw () {
     if (minute() == 0 && second() == 1) {
       save24HourLog();
     }
+    
+    
+    if (second() == 0 && minute() % 5 == 0) { // Every 5 minutes
+      if (wroteToLog == true || currentkWhReading == 0) {   // We've already written to the log during this current second, don't do it again, or we don't have valid data to save
+      } 
+      else {
+        saveMinuteLog();
+        saveWindowImage();
+        wroteToLog = true;  // Indicate we've written to the log on the first time so that we don't write 59 more log entries during
+        //                  //   the one second that our max 60 fps gives us. Luckily we're doing 1fps and shouldn't need this, but just in case
+        
+        saveLastUpdateTimestamp();
+        
+        fill(255, 0, 0);    // Red
+        ellipse(width - 20, height - 20, 15, 15); // Make a little "record" symbol in the bottom right corner to say we're writing to the log
+        calculateBilling(); // Also update our billing numbers
+        calculateUsage(24); // This would probably be better as 1 instead of 24, but it takes so little to process we might as well do 24
+      }
+    } 
+    else {
+      wroteToLog = false;   // If we're not at the proper second then don't log and write false so we're ready when it is the proper second
+    }
+
+    if (hour() == 0 && minute() == 0 && second() == 0) { // Midnight
+      // It's a new day so we need to update our usage for the day by storing our current usage
+      midnightUsage = currentkWhReading;
+    }
+
   }
   else {
     /////////////////////////////  Only do the following code if we DO NOT have a valid kWh reading /////////////////////////////

@@ -72,8 +72,9 @@ void drawGraph(float[] usage, int startX, int startY, int w, int h, int hilite, 
       fill(200); // Fill with a brigher color for our current hour
       barHue = 175; // Change our hue for out current hour
     }
-    if (label.equals("Daily Usage for past month:") && i == (billingCycleStartDay - day()) + 30) {
+    if (label.equals("Daily Usage for past month:") && i == abs(billingCycleStartDay + (day() - 29)) ) {
       // Let's manually hilite the billingCycleStartDay
+      // We need to make this if() more robust I think, maybe using Java Calendar library?
       fill(150);
       barHue = 0;
     }
