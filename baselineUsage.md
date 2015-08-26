@@ -1,0 +1,7 @@
+# Baseline Usage Rate #
+
+Your baseline usage is a kWh value that you may want to calculate manually. It's meant to be the minimal kWh usage that your household uses when there are no heavy loads running. You might think of it as the amount of electricity your house would use if you were away on vacation and weren't using the air conditioning, doing laundry, etc. It would be all the "phantom loads" like wall warts, but also things like night lights, lighted house number markers, refrigerator, and even your pool pump if it runs all the time.
+
+To calculate your baseline usage you'll probably be best off running this sketch or otherwise logging your usage, while making sure you aren't running anything that you don't consider to be part of your baseline usage (hair dryer, dishwasher, air conditioner, etc.) It worked best in my case to do this overnight. Then just see how long it takes to increment your kWh reading 1 whole unit and divide that by the number of hours it took to happen. In my case I came up with 0.167 as a baseline. Meaning it took about 5.9 hours to use 1 kWh.
+
+**Don't spend too much time on this though because the baseline usage is really only used on the graphs when we don't have more than 1 kWh to show!** In other words, you could just choose any figure less than 1 and it'd probably be fine :)
